@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Lock</title>
+  <style>
+    body {
+      background-color: #000;
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      color: white;
+    }
+
+    .display {
+      font-size: 24px;
+      margin-bottom: 10px;
+      letter-spacing: 5px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      width: 80px;
+      height: 80px;
+      font-size: 24px;
+      background: #222;
+      color: white;
+      border: 2px solid #555;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="lock">
+    <div class="display" id="codeDisplay">----</div>
+  </div>
+  <div class="buttons">
+    <button class="btn" onclick="press('1')">1</button>
+    <button class="btn" onclick="press('2')">2</button>
+    <button class="btn" onclick="press('3')">3</button>
+    <button class="btn" onclick="press('4')">4</button>
+    <button class="btn" onclick="press('5')">5</button>
+    <button class="btn" onclick="press('6')">6</button>
+    <button class="btn" onclick="press('7')">7</button>
+    <button class="btn" onclick="press('8')">8</button>
+    <button class="btn" onclick="press('9')">9</button>
+    <button class="btn" onclick="resetCode()">C</button>
+    <button class="btn" onclick="press('0')">0</button>
+    <button class="btn" onclick="checkCode()">OK</button>
+  </div>
+
+  <script>
+    let input = "";
+
+    function press(num) {
+      if (input.length < 4) {
+        input += num;
+        updateDisplay();
+      }
+    }
+
+    function resetCode() {
+      input = "";
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const padded = input.padEnd(4, "-");
+      document.getElementById("codeDisplay").textContent = padded;
+    }
+
+    function checkCode() {
+      if (input === "7421") {
+        window.location.href = "secret001.html";
+      } else {
+        input = "";
+        updateDisplay();
+        alert("Incorrect code");
+      }
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>

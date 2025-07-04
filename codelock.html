@@ -1,99 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Code Lock</title>
   <style>
     body {
-      background-color: #000;
+      background-color: black;
       margin: 0;
       padding: 0;
-      font-family: monospace;
+      overflow: hidden;
+    }
+
+    #wrapper {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      flex-direction: column;
-      color: white;
+      position: relative;
     }
 
-    .display {
-      font-size: 24px;
-      margin-bottom: 10px;
-      letter-spacing: 5px;
+    #case {
+      position: absolute;
+      width: 500px;
+      height: auto;
+      z-index: 0;
     }
 
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 80px);
-      gap: 10px;
-      margin-top: 10px;
+    #lock {
+      position: absolute;
+      width: 220px;
+      top: 180px;
+      left: 140px;
+      z-index: 1;
     }
 
-    .btn {
-      width: 80px;
-      height: 80px;
-      font-size: 24px;
-      background: #222;
-      color: white;
-      border: 2px solid #555;
-      cursor: pointer;
+    #display {
+      position: absolute;
+      top: 130px;
+      left: 165px;
+      font-family: monospace;
+      font-size: 20px;
+      color: #00ff00;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+      z-index: 2;
     }
 
-    .btn:hover {
-      background-color: #333;
+    .error {
+      animation: blink 0.2s steps(2, start) 3;
+    }
+
+    @keyframes blink {
+      0%, 100% { color: red; }
+      50% { color: black; }
     }
   </style>
 </head>
 <body>
-  <div class="lock">
-    <div class="display" id="codeDisplay">----</div>
-  </div>
-  <div class="buttons">
-    <button class="btn" onclick="press('1')">1</button>
-    <button class="btn" onclick="press('2')">2</button>
-    <button class="btn" onclick="press('3')">3</button>
-    <button class="btn" onclick="press('4')">4</button>
-    <button class="btn" onclick="press('5')">5</button>
-    <button class="btn" onclick="press('6')">6</button>
-    <button class="btn" onclick="press('7')">7</button>
-    <button class="btn" onclick="press('8')">8</button>
-    <button class="btn" onclick="press('9')">9</button>
-    <button class="btn" onclick="resetCode()">C</button>
-    <button class="btn" onclick="press('0')">0</button>
-    <button class="btn" onclick="checkCode()">OK</button>
+  <div id="wrapper">
+    <img src="codelock1.png" id="case" alt="lock case">
+    <img src="codelock.png" id="lock" alt="code lock">
+    <div id="display">____</div>
   </div>
 
   <script>
     let input = "";
-
-    function press(num) {
-      if (input.length < 4) {
-        input += num;
-        updateDisplay();
-      }
-    }
-
-    function resetCode() {
-      input = "";
-      updateDisplay();
-    }
+    const display = document.getElementById("display");
+    const validCodes = {
+      "1717": "entrynum17.html"
+    };
 
     function updateDisplay() {
-      const padded = input.padEnd(4, "-");
-      document.getElementById("codeDisplay").textContent = padded;
+      display.textContent = input.padEnd(4, "_");
     }
 
-    function checkCode() {
-      if (input === "7421") {
-        window.location.href = "secret001.html";
+    function resetInput(error = false) {
+      if (error) {
+        display.classList.add("error");
+        setTimeout(() => {
+          display.classList.remove("error");
+          input = "";
+          updateDisplay();
+        }, 600);
       } else {
         input = "";
         updateDisplay();
-        alert("Incorrect code");
       }
     }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace") {
+        input = input.slice(0, -1);
+        updateDisplay();
+        return;
+      }
+
+      if (!/^[0-9]$/.test(e.key)) return;
+      if (input.length >= 4) return;
+
+      input += e.key;
+      updateDisplay();
+
+      if (input.length === 4) {
+        if (validCodes[input]) {
+          window.location.href = validCodes[input];
+        } else {
+          resetInput(true);
+        }
+      }
+    });
 
     updateDisplay();
   </script>

@@ -3,130 +3,138 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Codelock</title>
+  <title>Code Lock</title>
   <style>
     body {
-      margin: 0;
       background: black;
+      color: #00ff00;
       font-family: monospace;
-      color: white;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
 
-    #lock-wrapper {
-      position: relative;
-      width: 256px;
-      height: 256px;
-    }
-
-    #codelock-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 0;
-    }
-
-    #codelock-fg {
-      position: absolute;
-      top: -16px;
-      left: -16px;
-      width: 288px;
-      height: 288px;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .key {
-      position: absolute;
-      width: 33.33%;
-      height: 33.33%;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      z-index: 1;
-    }
-
-    .key:active {
-      filter: brightness(0.8);
-    }
-
-    #code-display {
-      font-size: 24px;
+    #display {
+      font-size: 32px;
       margin-bottom: 20px;
-      letter-spacing: 4px;
+      letter-spacing: 10px;
     }
 
-    #reset-button {
-      margin-top: 20px;
-      background: none;
-      border: 1px solid white;
-      color: white;
-      font-family: monospace;
-      padding: 5px 10px;
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      gap: 10px;
+    }
+
+    button {
+      background: #111;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      font-size: 24px;
+      padding: 15px;
       cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #00ff00;
+      color: black;
+    }
+
+    .error {
+      animation: flash 0.3s steps(2, start) 3;
+    }
+
+    @keyframes flash {
+      0%, 100% { color: red; }
+      50% { color: black; }
     }
   </style>
 </head>
 <body>
+  <!-- Display -->
+  <div id="display">____</div>
 
-  <div id="code-display"></div>
-
-  <div id="lock-wrapper">
-    <img src="codelock.png" alt="Codelock" id="codelock-bg" />
-
-    <!-- 3x3 buttons -->
-    <button class="key" data-num="1" style="top: 0%; left: 0%;"></button>
-    <button class="key" data-num="2" style="top: 0%; left: 33.33%;"></button>
-    <button class="key" data-num="3" style="top: 0%; left: 66.66%;"></button>
-
-    <button class="key" data-num="4" style="top: 33.33%; left: 0%;"></button>
-    <button class="key" data-num="5" style="top: 33.33%; left: 33.33%;"></button>
-    <button class="key" data-num="6" style="top: 33.33%; left: 66.66%;"></button>
-
-    <button class="key" data-num="7" style="top: 66.66%; left: 0%;"></button>
-    <button class="key" data-num="8" style="top: 66.66%; left: 33.33%;"></button>
-    <button class="key" data-num="9" style="top: 66.66%; left: 66.66%;"></button>
+  <!-- Keypad -->
+  <div class="keypad">
+    <button onclick="press('1')">1</button>
+    <button onclick="press('2')">2</button>
+    <button onclick="press('3')">3</button>
+    <button onclick="press('4')">4</button>
+    <button onclick="press('5')">5</button>
+    <button onclick="press('6')">6</button>
+    <button onclick="press('7')">7</button>
+    <button onclick="press('8')">8</button>
+    <button onclick="press('9')">9</button>
+    <button onclick="clearInput()">C</button>
+    <button onclick="press('0')">0</button>
+    <button onclick="backspace()">⌫</button>
   </div>
 
-  <button id="reset-button">Reset</button>
+  <!-- Audio Elements -->
+  <audio id="clickSound" src="click.wav" preload="auto"></audio>
+  <audio id="errorSound" src="error.mp3" preload="auto"></audio>
 
   <script>
-    const correctCode = "1717";
-    let inputCode = "";
+    const display = document.getElementById("display");
+    const clickSound = document.getElementById("clickSound");
+    const errorSound = document.getElementById("errorSound");
 
-    const display = document.getElementById("code-display");
-    const buttons = document.querySelectorAll(".key");
+    let input = "";
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => {
-        if (inputCode.length < 4) {
-          inputCode += button.dataset.num;
-          display.textContent = inputCode;
+    const validCodes = {
+      "1717": "entrynum17.html",
+      "0001": "secret001.html"
+    };
 
-          if (inputCode.length === 4) {
-            setTimeout(() => {
-              if (inputCode === correctCode) {
-                window.location.href = "entrynum17.html";
-              } else {
-                display.textContent = "----";
-                inputCode = "";
-              }
-            }, 300);
-          }
+    function press(num) {
+      if (input.length >= 4) return;
+      input += num;
+      updateDisplay();
+      clickSound.currentTime = 0;
+      clickSound.play();
+
+      if (input.length === 4) {
+        if (validCodes[input]) {
+          window.location.href = validCodes[input];
+        } else {
+          error();
         }
-      });
-    });
+      }
+    }
 
-    const resetButton = document.getElementById("reset-button");
-    resetButton.addEventListener("click", () => {
-      inputCode = "";
-      display.textContent = "";
-    });
+    function updateDisplay() {
+      display.textContent = input.padEnd(4, "_");
+    }
+
+    function backspace() {
+      input = input.slice(0, -1);
+      updateDisplay();
+      clickSound.currentTime = 0;
+      clickSound.play();
+    }
+
+    function clearInput() {
+      input = "";
+      updateDisplay();
+      clickSound.currentTime = 0;
+      clickSound.play();
+    }
+
+    function error() {
+      display.classList.add("error");
+      errorSound.currentTime = 0;
+      errorSound.play();
+      setTimeout(() => {
+        display.classList.remove("error");
+        clearInput();
+      }, 500);
+    }
+
+    updateDisplay();
   </script>
 </body>
 </html>

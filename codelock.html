@@ -1,117 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Code Lock</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Codelock</title>
   <style>
     body {
-      background-color: black;
       margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
-
-    #wrapper {
+      background: black;
+      font-family: monospace;
+      color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      position: relative;
+      flex-direction: column;
     }
 
-    #case {
+    #lock-wrapper {
+      position: relative;
+      width: 256px;
+      height: 256px;
+    }
+
+    #codelock-bg {
       position: absolute;
-      width: 500px;
-      height: auto;
+      top: 0;
+      left: 0;
+      width: 100%;
       z-index: 0;
     }
 
-    #lock {
+    #codelock-fg {
       position: absolute;
-      width: 220px;
-      top: 180px;
-      left: 140px;
+      top: -16px;
+      left: -16px;
+      width: 288px;
+      height: 288px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .key {
+      position: absolute;
+      width: 33.33%;
+      height: 33.33%;
+      background: transparent;
+      border: none;
+      cursor: pointer;
       z-index: 1;
     }
 
-    #display {
-      position: absolute;
-      top: 130px;
-      left: 165px;
+    .key:active {
+      filter: brightness(0.8);
+    }
+
+    #code-display {
+      font-size: 24px;
+      margin-bottom: 20px;
+      letter-spacing: 4px;
+    }
+
+    #reset-button {
+      margin-top: 20px;
+      background: none;
+      border: 1px solid white;
+      color: white;
       font-family: monospace;
-      font-size: 20px;
-      color: #00ff00;
-      background: rgba(0, 0, 0, 0.5);
       padding: 5px 10px;
-      border-radius: 5px;
-      z-index: 2;
-    }
-
-    .error {
-      animation: blink 0.2s steps(2, start) 3;
-    }
-
-    @keyframes blink {
-      0%, 100% { color: red; }
-      50% { color: black; }
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="wrapper">
-    <img src="codelock1.png" id="case" alt="lock case">
-    <img src="codelock.png" id="lock" alt="code lock">
-    <div id="display">____</div>
+
+  <div id="code-display"></div>
+
+  <div id="lock-wrapper">
+    <img src="codelock.png" alt="Codelock" id="codelock-bg" />
+
+    <!-- 3x3 buttons -->
+    <button class="key" data-num="1" style="top: 0%; left: 0%;"></button>
+    <button class="key" data-num="2" style="top: 0%; left: 33.33%;"></button>
+    <button class="key" data-num="3" style="top: 0%; left: 66.66%;"></button>
+
+    <button class="key" data-num="4" style="top: 33.33%; left: 0%;"></button>
+    <button class="key" data-num="5" style="top: 33.33%; left: 33.33%;"></button>
+    <button class="key" data-num="6" style="top: 33.33%; left: 66.66%;"></button>
+
+    <button class="key" data-num="7" style="top: 66.66%; left: 0%;"></button>
+    <button class="key" data-num="8" style="top: 66.66%; left: 33.33%;"></button>
+    <button class="key" data-num="9" style="top: 66.66%; left: 66.66%;"></button>
   </div>
 
+  <button id="reset-button">Reset</button>
+
   <script>
-    let input = "";
-    const display = document.getElementById("display");
-    const validCodes = {
-      "1717": "entrynum17.html"
-    };
+    const correctCode = "1717";
+    let inputCode = "";
 
-    function updateDisplay() {
-      display.textContent = input.padEnd(4, "_");
-    }
+    const display = document.getElementById("code-display");
+    const buttons = document.querySelectorAll(".key");
 
-    function resetInput(error = false) {
-      if (error) {
-        display.classList.add("error");
-        setTimeout(() => {
-          display.classList.remove("error");
-          input = "";
-          updateDisplay();
-        }, 600);
-      } else {
-        input = "";
-        updateDisplay();
-      }
-    }
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (inputCode.length < 4) {
+          inputCode += button.dataset.num;
+          display.textContent = inputCode;
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Backspace") {
-        input = input.slice(0, -1);
-        updateDisplay();
-        return;
-      }
-
-      if (!/^[0-9]$/.test(e.key)) return;
-      if (input.length >= 4) return;
-
-      input += e.key;
-      updateDisplay();
-
-      if (input.length === 4) {
-        if (validCodes[input]) {
-          window.location.href = validCodes[input];
-        } else {
-          resetInput(true);
+          if (inputCode.length === 4) {
+            setTimeout(() => {
+              if (inputCode === correctCode) {
+                window.location.href = "entrynum17.html";
+              } else {
+                display.textContent = "----";
+                inputCode = "";
+              }
+            }, 300);
+          }
         }
-      }
+      });
     });
 
-    updateDisplay();
+    const resetButton = document.getElementById("reset-button");
+    resetButton.addEventListener("click", () => {
+      inputCode = "";
+      display.textContent = "";
+    });
   </script>
 </body>
 </html>

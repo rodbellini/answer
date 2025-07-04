@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>entrynum17</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      color: green;
+      font-family: monospace;
+      overflow: hidden;
+    }
+
+    #container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30px;
+      box-sizing: border-box;
+    }
+
+    .text {
+      max-width: 55%;
+      line-height: 1.5em;
+      font-size: 16px;
+    }
+
+    .line {
+      opacity: 0;
+      white-space: pre;
+    }
+
+    .quote {
+      color: white;
+      font-weight: bold;
+      font-family: monospace;
+    }
+
+    .ghost {
+      width: 550px;
+      height: auto;
+      opacity: 0.85;
+      animation: fade 3s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 20px white);
+    }
+
+    @keyframes fade {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div class="text" id="textBlock">
+      <!-- dynamically filled -->
+    </div>
+    <img src="mankind.gif" class="ghost" alt="ghostly entity" />
+  </div>
+
+  <script>
+    const lines = [
+      "* [][][][][][][][][][][][][][][][][][][]",
+      "* [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][",
+      "* It was utterly disgusting, seeing its face melt.",
+      "* Seeing [][][][][][][][][][] break into millions of pieces inside the machine. It didn't go well.",
+      "* We and the others planned on destroying it, but it only grew stronger.",
+      "* After 43 hours, [][][][][][][][][][] came back. He said.",
+      '* "I\'ve seen it, the limbo and the void. Smashed together to create it all."',
+      "* We are still investigating it. But it was no use — he doesn't remember anything."
+    ];
+
+    const textBlock = document.getElementById("textBlock");
+
+    function typeLine(line, index) {
+      const div = document.createElement("div");
+      div.classList.add("line");
+      if (index === 6) div.classList.add("quote"); // Make the quote white
+      textBlock.appendChild(div);
+
+      let j = 0;
+      const typing = setInterval(() => {
+        div.textContent += line[j];
+        j++;
+        if (j >= line.length) {
+          clearInterval(typing);
+          div.style.opacity = 1;
+          if (index < lines.length - 1) {
+            setTimeout(() => typeLine(lines[index + 1], index + 1), 500);
+          }
+        }
+      }, 30);
+    }
+
+    typeLine(lines[0], 0);
+  </script>
+</body>
+</html>

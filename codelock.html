@@ -6,87 +6,119 @@
   <style>
     body {
       background-color: black;
-      color: white;
       font-family: monospace;
-      text-align: center;
-      margin-top: 50px;
-    }
-    .display {
-      font-size: 24px;
-      margin-bottom: 20px;
       color: lime;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
     }
+
+    .display {
+      font-size: 36px;
+      letter-spacing: 15px;
+      margin-bottom: 20px;
+    }
+
     .keypad {
       display: grid;
-      grid-template-columns: repeat(3, 60px);
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(3, 80px);
+      grid-gap: 10px;
     }
-    button {
-      background: black;
-      color: white;
+
+    .btn {
+      background-color: black;
+      color: lime;
+      border: 2px solid lime;
       font-size: 24px;
-      border: 1px solid white;
-      width: 60px;
-      height: 60px;
+      padding: 20px;
       cursor: pointer;
+      transition: background-color 0.2s;
     }
-    #resetBtn {
-      margin-top: 10px;
-      padding: 8px 16px;
+
+    .btn:hover {
+      background-color: #003300;
+    }
+
+    .btn:active {
+      background-color: #006600;
     }
   </style>
 </head>
 <body>
-  <div class="display" id="display">Code: </div>
-  <div class="keypad">
-    <button onclick="press(1)">1</button>
-    <button onclick="press(2)">2</button>
-    <button onclick="press(3)">3</button>
-    <button onclick="press(4)">4</button>
-    <button onclick="press(5)">5</button>
-    <button onclick="press(6)">6</button>
-    <button onclick="press(7)">7</button>
-    <button onclick="press(8)">8</button>
-    <button onclick="press(9)">9</button>
-  </div>
-  <button id="resetBtn" onclick="resetCode()">Reset</button>
 
-  <!-- Sounds -->
+  <div class="display" id="display">_ _ _ _</div>
+
+  <div class="keypad">
+    <button class="btn" onclick="press('1')">1</button>
+    <button class="btn" onclick="press('2')">2</button>
+    <button class="btn" onclick="press('3')">3</button>
+    <button class="btn" onclick="press('4')">4</button>
+    <button class="btn" onclick="press('5')">5</button>
+    <button class="btn" onclick="press('6')">6</button>
+    <button class="btn" onclick="press('7')">7</button>
+    <button class="btn" onclick="press('8')">8</button>
+    <button class="btn" onclick="press('9')">9</button>
+    <button class="btn" onclick="resetCode()">C</button>
+    <button class="btn" onclick="press('0')">0</button>
+    <button class="btn" onclick="deleteLast()">⌫</button>
+  </div>
+
+  <!-- Sound Effects -->
   <audio id="clickSound" src="click.wav" preload="auto"></audio>
   <audio id="errorSound" src="error.mp3" preload="auto"></audio>
 
   <script>
-    const correctCode1 = "1717";
-    const correctCode2 = "0000"; // Optional second code for testing
-    let input = "";
     const display = document.getElementById('display');
     const clickSound = document.getElementById('clickSound');
     const errorSound = document.getElementById('errorSound');
 
-    function press(num) {
-      if (input.length >= 4) return;
-      input += num;
-      display.textContent = "Code: " + input;
-      clickSound.play();
+    const validCodes = {
+      "0000": "secret001.html",
+      "1717": "entrynum17.html"
+    };
 
-      if (input.length === 4) {
-        if (input === correctCode1) {
-          window.location.href = "entrynum17.html";
-        } else if (input === correctCode2) {
-          window.location.href = "secret001.html";
-        } else {
-          errorSound.play();
-          display.textContent = "Code: " + input + " (WRONG)";
-        }
+    let input = "";
+
+    function updateDisplay() {
+      let shown = input.padEnd(4, "_").split("").join(" ");
+      display.textContent = shown;
+    }
+
+    function press(num) {
+      if (input.length < 4) {
+        input += num;
+        updateDisplay();
+        clickSound.play();
+        if (input.length === 4) checkCode();
       }
     }
 
     function resetCode() {
       input = "";
-      display.textContent = "Code: ";
+      updateDisplay();
     }
+
+    function deleteLast() {
+      input = input.slice(0, -1);
+      updateDisplay();
+    }
+
+    function checkCode() {
+      if (validCodes[input]) {
+        window.location.href = validCodes[input];
+      } else {
+        errorSound.play();
+        setTimeout(() => {
+          resetCode();
+        }, 800);
+      }
+    }
+
+    // Init display
+    updateDisplay();
   </script>
+
 </body>
 </html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Friends</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: monospace;
+    }
+
+    .frame {
+      position: relative;
+      width: 512px; /* match FriendsToday.png size */
+      height: 512px;
+    }
+
+    .text-box {
+      position: absolute;
+      top: 5px; /* position text in the gap */
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      color: red;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-line;
+      width: 90%;
+    }
+
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <div class="text-box">
+      "I miss you, so much."<br>
+      "I missed you so much i.. i.."<br>
+      "I stopped, Looked. And realized."<br>
+      "I shot my self."
+    </div>
+    <img src="FriendsToday.png" alt="Friends with Today" class="background">
+  </div>
+</body>
+</html>
